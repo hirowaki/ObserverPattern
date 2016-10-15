@@ -1,0 +1,5 @@
+/Users/kadowaki.hiroshi/private/ObserverPattern/ObserverPattern/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Users/kadowaki.hiroshi/private/ObserverPattern/ObserverPattern/bin/Debug/ObserverPattern.exe.mdb
+/Users/kadowaki.hiroshi/private/ObserverPattern/ObserverPattern/bin/Debug/ObserverPattern.exe
+/Users/kadowaki.hiroshi/private/ObserverPattern/ObserverPattern/obj/x86/Debug/ObserverPattern.exe
+/Users/kadowaki.hiroshi/private/ObserverPattern/ObserverPattern/obj/x86/Debug/ObserverPattern.exe.mdb
