@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace ObserverPattern
 {
+    // data to pass around.
     public class EmitterData: INotifyData {
         public string _data { get; private set; }
 
@@ -11,6 +12,7 @@ namespace ObserverPattern
         }
     }
 
+    // Objecy which has an Emitter.
     public class Emitter: INotifyEmitter {
         protected NotifyEmitter _emitter;
 
@@ -24,13 +26,15 @@ namespace ObserverPattern
 
         public void NotifyEvent(string eventName, INotifyData data) {
             var info = data as EmitterData;
-            Console.WriteLine("NotifyEvent : " + eventName + " / " + info._data);
+            if (_emitter.HasObserver()) {
+                Console.WriteLine("NotifyEvent : " + eventName + " / " + info._data);
 
-            _emitter.NotifyEvent(eventName, data);
+                _emitter.NotifyEvent(eventName, data);
+            }
         }
     }
 
-    // Observer / Emitter.
+    // Object which has functions as both Observer and Emitter.
     public class Transmitter: Emitter, INotifyObserver {
         protected NotifyObserver _observer;
         private String _name;
@@ -57,36 +61,65 @@ namespace ObserverPattern
 
             Console.WriteLine(_name + "::onNotify : " + eventName + " / " + info._data);
 
-            NotifyEvent(eventName, data);   // propagate the event to observers who are looking at you.
+            // The default behavior of this test transmitter would be
+            // to propagate the event to observers who are looking at you.
+            NotifyEvent(eventName, data);
         }
     }
 
 
     public class Test {
         public void Run() {
-            Transmitter compnent1 = new Transmitter("KING");
-            Transmitter compnent2 = new Transmitter("KNIGHT");
-            Transmitter compnent3 = new Transmitter("SOLDER");
+            RunCase1();
+            RunCase2();
+        }
 
-            Console.WriteLine("START");
-            compnent1.StartObserving(compnent2);
-            compnent2.StartObserving(compnent3);
+        private void RunCase1() {
+            // KING => KNIGHT => SOLDIER.
+            // SOLDIER's event must be propagated to KNIGHT => be reached out KING (in serial order).
+            // KNIGHT's event must be propagated to KING.
 
-            compnent3.NotifyEvent("TEST_EVENT: ", new EmitterData("SOLDER EVENT 1"));
-            compnent3.NotifyEvent("TEST_EVENT: ", new EmitterData("SOLDER EVENT 2"));
-            compnent3.NotifyEvent("TEST_EVENT: ", new EmitterData("SOLDER EVENT 3"));
-            compnent3.NotifyEvent("TEST_EVENT: ", new EmitterData("SOLDER EVENT 4"));
+            Transmitter king = new Transmitter("KING");
+            Transmitter knight = new Transmitter("KNIGHT");
+            Transmitter soldier = new Transmitter("SOLDIER");
 
-            compnent2.NotifyEvent("TEST_EVENT: ", new EmitterData("KNIGHT EVENT 1"));
+            Console.WriteLine("RUN: Case1");
+            king.StartObserving(knight);
+            knight.StartObserving(soldier);
 
-            compnent1.NotifyEvent("TEST_EVENT: ", new EmitterData("KING EVENT 1"));
+            // This event should be received by KNIGHT ans then KING.
+            soldier.NotifyEvent("TEST_EVENT: ", new EmitterData("SOLDIER EVENT 1"));
 
-            compnent1.StopObservingAll();
-            compnent2.StopObservingAll();
+            // This event should be received by KING.
+            knight.NotifyEvent("TEST_EVENT: ", new EmitterData("KNIGHT EVENT 1"));
 
-            compnent3.NotifyEvent("TEST_EVENT: ", new EmitterData("KING EVENT 1"));
+            // This event should not be notified to anyone.
+            king.NotifyEvent("TEST_EVENT: ", new EmitterData("KING EVENT 1"));
 
-            Console.WriteLine("FINISH");
+            king.StopObservingAll();
+            knight.StopObservingAll();
+
+            Console.WriteLine("FINISH\n");
+        }
+
+        private void RunCase2() {
+            // KING A / KING B => KNIGHT.
+
+            Transmitter kingA = new Transmitter("KING A");
+            Transmitter kingB = new Transmitter("KING B");
+            Transmitter knight = new Transmitter("NIGHT");
+
+            Console.WriteLine("RUN: Case2");
+            kingA.StartObserving(knight);
+            kingB.StartObserving(knight);
+
+            // This event should be received by kingA and kingB.
+            knight.NotifyEvent("TEST_EVENT: ", new EmitterData("NIGHT EVENT 1"));
+
+            kingA.StopObservingAll();
+            kingB.StopObservingAll();
+
+            Console.WriteLine("FINISH/n");
         }
     }
 }

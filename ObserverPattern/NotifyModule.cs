@@ -68,7 +68,7 @@ namespace ObserverPattern
         }
 
         public bool AddObserver(INotifyObserver observer) {
-            if (_observers.Contains(observer)) {
+            if (HasObserver(observer)) {
                 return false;
             }
             _observers.Add(observer);
@@ -76,7 +76,7 @@ namespace ObserverPattern
         }
 
         public bool RemoveObserver(INotifyObserver observer) {
-            if (_observers.Contains(observer)) {
+            if (HasObserver(observer)) {
                 _observers.Remove(observer);
                 return true;
             }
@@ -85,6 +85,14 @@ namespace ObserverPattern
 
         public void RemoveObserverAll() {
             _observers.Clear();
+        }
+
+        public bool HasObserver() {
+            return (_observers.Count > 0);
+        }
+
+        public bool HasObserver(INotifyObserver observer) {
+            return _observers.Contains(observer);
         }
 
         public void NotifyEvent(string eventName, INotifyData data) {
